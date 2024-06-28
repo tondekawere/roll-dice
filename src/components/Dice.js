@@ -1,21 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, Button, Typography, Grid } from "@mui/material";
 import "../App.css";
 
 function Dice() {
   const [dice, setDice] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-  const [isFrozen, setIsFrozen] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [isFrozen, setIsFrozen] = useState(Array(10).fill(false));
+  const [isGameWon, setIsGameWon] = useState(false);
+
+  useEffect(() => {
+    if (isFrozen.every((frozen) => frozen) && new Set(dice).size === 1) {
+      setIsGameWon(true);
+    }
+  }, [isFrozen, dice]);
 
   const rollDice = () => {
     const newDice = dice.map((die, index) => {
@@ -24,6 +20,7 @@ function Dice() {
       }
       return die;
     });
+
     setDice(newDice);
   };
 
@@ -33,8 +30,10 @@ function Dice() {
     setIsFrozen(newIsFrozen);
   };
 
-  const allDiceAreSame = () => {
-    return new Set(dice).size === 1;
+  const resetGame = () => {
+    setDice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    setIsFrozen(Array(10).fill(false));
+    setIsGameWon(false);
   };
 
   return (
@@ -165,18 +164,18 @@ function Dice() {
           variant="contained"
           color="primary"
           mb={3}
-          onClick={rollDice}
-          disabled={allDiceAreSame()}
+          onClick={isGameWon ? resetGame : rollDice}
           style={{
             marginTop: "20px",
             background: "#5035FF",
             fontSize: "16.38px",
             textTransform: "none",
             fontWeight: "700",
-            width: "92.16px",
+            width: isGameWon ? "auto" : "92.16px",
+            padding: isGameWon ? "6px 16px" : "auto",
           }}
         >
-          Roll
+          {isGameWon ? "New Game" : "Roll"}
         </Button>
       </CardContent>
     </Card>
